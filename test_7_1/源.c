@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <assert.h>
 //int main() {
 //	int input = 0;
 //	printf("注入能量\n");
@@ -2137,4 +2138,975 @@
 //	print2(&s);//效果更好
 //	return 0;
 //}
-//参数压栈
+//越界导致死循环
+//int main()
+//{	//vc6.0 <=10 死循环
+//	//gcc <=11 死循环
+//	//vs2013 <=12 死循环
+//	//内存布局的差异
+//	int arr[10] = { 1,2,3,4,5,6,7,8,9,10 };
+//	for (int i = 0; i <= 12; i++)
+//	{
+//		printf("hehe\n");
+//		arr[i] = 0;
+//	}
+//	return 0;
+//}
+//模拟实现库函数strcpy
+// 6分
+//void my_strcpy(char* dest,char* src)
+//{
+//	while (*(src-1) != '\0')
+//	{
+//		//*dest = *src;
+//		//src++;
+//		//dest++;
+//		//优化
+//		*dest++ = *src++;
+//	}
+//}
+// 
+//再优化 7分
+//void my_strcpy(char* dest, char* src)
+//{
+//	while (*dest++ = *src++)
+//	{
+//		;
+//	}
+//}
+//若传参为NULL，再优化 8分
+//void my_strcpy(char* dest, char* src)
+//{
+//	if (dest != NULL && src != NULL) {
+//		while (*dest++ = *src++)
+//		{
+//			;
+//		}
+//	}
+//}
+//void my_strcpy(char* dest, char* src)
+//{
+//	assert(dest != NULL);
+//	assert(src != NULL);//#include <assert.h>,断言
+//	while (*dest++ = *src++)
+//	{
+//		;
+//	}
+//}
+//9分
+//void my_strcpy(char* dest, const char* src)//const保护源头数据
+//{
+//	assert(dest != NULL);
+//	assert(src != NULL);//#include <assert.h>,断言
+//	while (*dest++ = *src++)
+//	{
+//		;
+//	}
+//}
+//int main()
+//{
+//	char arr1[] = "###############";
+//	char arr2[] = "bit";
+//	my_strcpy(arr1, NULL);
+//	printf("%s\n", arr1);
+//	return 0;
+//}
+//char* my_strcpy(char* dest, const char* src)//const保护源头数据,char*返回目的地初始地址
+//{
+//	char* ret = dest;
+//	assert(dest != NULL);
+//	assert(src != NULL);//#include <assert.h>,断言
+//	while (*dest++ = *src++)
+//	{
+//		;
+//	}
+//	return ret;
+//}
+//int main()
+//{
+//	char arr1[] = "###############";
+//	char arr2[] = "bit";
+//	printf("%s\n", my_strcpy(arr1, arr2));//链式访问
+//	return 0;
+//}
+//
+//int main()
+//{
+//	const int num = 10;//const修饰，num不允许修改
+//	const int* p = &num;
+//	*p = 20;
+//
+//	printf("%d\n", num);
+//	return 0;
+//}
+//strlen函数实现
+//int my_strlen(const char* str)//不允许str所指向内容改变
+//{
+//	int count = 0;
+//	assert(str != NULL);//保证指针有效性
+//	while (*str != '\0')
+//	{
+//		count++;
+//		str++;
+//	}
+//	return count;
+//}
+//int main()
+//{
+//	char arr[] = "abcdef";
+//	int len = my_strlen(arr);
+//	printf("%d\n", len);
+//	return 0;
+//}
+//数据的存储
+//int main()
+//{
+//	int a = 10;
+//	float f = 10.0;
+//
+//	return 0;
+//}
+//void test(void)
+//{
+//	printf("hehe\n");
+//}
+//int main()
+//{
+//	test(100);
+//	return 0;
+//}
+//判断当前计算机的字节序
+//int check_sys()
+//{
+//	int i = 1;
+//	char* p = (char*)&i;
+//	return *p;//返回1，小端 ；0 大端
+//}
+//int check_sys()
+//{
+//	int i = 1;
+//	return *(char*)&i;
+//}
+//int main()
+//{
+//	int ret = check_sys();
+//	if (ret == 1)
+//	{
+//		printf("小端\n");
+//	}
+//	else
+//		printf("大端\n");
+//	return 0;
+//}
+//练习（程序运行结果）
+//int main()
+//{
+//	char a = -1;
+//	signed char b = -1;
+//	unsigned char c = -1;
+//	printf("a=%d,b=%d,c=%d\n", a, b, c);//-1,-1,255,%d整型提升
+//	return 0;
+//}
+//int main()
+//{
+//	char a = -128;
+//	//100000000 00000000 00000000 10000000 原
+//	//111111111 11111111 11111111 01111111 反
+//	//111111111 11111111 11111111 10000000 补
+//	//10000000
+//	//111111111 11111111 11111111 10000000 整型提升
+//	printf("%u\n", a);//%u无符号十进制数  4294967168
+//	return 0;
+//}
+//int main()
+//{
+//	char a = 128;//127+1=-128
+//	printf("%u\n", a);//4294967168
+//	return 0;
+//}
+//int main()
+//{
+//	int i = -20;
+//	unsigned int j = 10;
+//	printf("%d\n", i + j);//按照补码运算，最后格式化为有符号整数 -10
+//	//10000000 00000000 00000000 00010100
+//	//11111111 11111111 11111111 11101011
+//	//11111111 11111111 11111111 11101100  -20补码
+//	//00000000 00000000 00000000 00001010  10补码，无符号数
+//	//11111111 11111111 11111111 11110110  补码
+//	//10000000 00000000 00000000 00001010  源码  -10
+//	return 0;
+//}
+//int main()
+//{
+//	unsigned int i;
+//	for (i = 9; i >= 0; i--)
+//	{
+//		printf("%u\n", i);//将-1变为无符号数，很大数。。。。
+//		Sleep(100);//睡眠100毫秒
+//	}
+//	return 0;
+//}
+//int main()
+//{
+//	char a[1000];
+//	int i;
+//	for (i = 0; i < 1000; i++)
+//	{
+//		a[i] = -1 - i;
+//	}
+//	printf("%d", strlen(a));//255
+//	//strlen到\0截至
+//	//-1，-2，-3。。。。。-128，127，126.。。。。3，2，1，0
+//	return 0;
+//}
+//unsigned char i = 0;
+//int main()
+//{
+//	for (i = 0; i <= 255; i++)
+//	{
+//		printf("hello world\n");//255+1=0,死循环
+//	}
+//	return 0;
+//}
+//浮点数在内存中的存储
+//int main()
+//{
+//	int n = 9;
+//	//0 00000000 00000000000000000001001 -补码
+//	//
+//	float* pFloat = (float*)&n;
+//	printf("n的值为 %d\n", n);
+//	printf("*pFloat的值为 %f\n", *pFloat);//%f打印6个bit
+//	//(-1)^0*0.00000000000000000001001*2^126
+//	//0.000000
+//
+//	*pFloat = 9.0;
+//	//1001.0
+//	// 1.001*2^3
+//	//(-1)^0*1.001*2^3
+//	//S=0,M=1.001,E=3+127=130
+//	//0 10000010 00100000000000000000000
+//	printf("n的值为 %d\n", n);//整数打印
+//	//01000001000100000000000000000000 - 补码
+//	//1091567616 - 十进制
+//	printf("*pFloat的值为 %f\n", *pFloat);
+//	//9.000000
+//	return 0;
+//}
+//void test(int arr[])
+//{
+//	printf("%d\n", sizeof(arr) / sizeof(arr[0]));
+//}
+//int main()
+//{
+//	int arr[10] = { 0 };
+//	test(arr);
+//	return 0;
+//}
+//字符指针
+//int main()
+//{
+//	/*char ch = 'w';
+//	char* pc = &ch;*/
+//
+//	//char arr[] = "abcdef";
+//	//char* pc = arr;
+//	//printf("%s\n", arr);
+//	//printf("%s\n", pc);
+//
+//	char* p = "abcdef";//常量字符串
+//	//*p = 'W';//段错误
+//	printf("%c\n", *p);
+//	printf("%s\n", p);
+//	return 0;
+//}
+//面试题
+//int main()
+//{
+//	char arr1[] = "abcdef";
+//	char arr2[] = "abcdef";
+//	char* p1 = "abcdef";
+//	char* p2 = "abcdef";
+//	//if (arr1 == arr2)//arr1和arr2地址不同
+//	//{
+//	//	printf("hehe\n");
+//	//}
+//	//else
+//	//{
+//	//	printf("haha\n");
+//	//}
+//	if (p1 == p2)
+//	{
+//		printf("hehe\n");
+//	}
+//	else
+//	{
+//		printf("haha\n");
+//	}
+//	return 0;//hehe
+//}
+//剑指offer电子版
+//指针数组
+//int main()
+//{
+//	int a = 10;
+//	int b = 20;
+//	int c = 30;
+//	int d = 40;
+//	int* arr[4] = { &a,&b,&c,&d };
+//	int i = 0;
+//	for (i = 0; i < 4; i++)
+//	{
+//		printf("%d ", *(arr[i]));
+//	}
+//	return 0;
+//}
+//int main()
+//{
+//	int arr1[] = { 1,2,3,4,5 };
+//	int arr2[] = { 2,3,4,5,6 };
+//	int arr3[] = { 3,4,5,6,7 };
+//	int* parr[] = { arr1,arr2,arr3 };
+//	int i = 0;
+//	for (i = 0; i < 3; i++)
+//	{
+//		int j = 0;
+//		for (j = 0; j < 5; j++)
+//		{
+//			printf("%d ", *(parr[i] + j));
+//		}
+//		printf("\n");
+//	}
+//	return 0;
+//}
+//数组指针
+//int main()
+//{
+//	int* p = NULL;
+//	int arr[10] = { 1,2,3,4,5,6,7,8,9,10 };
+//	int(*p)[10] = &arr;
+//	return 0;
+//}
+//int main()
+//{
+//	char* arr[5];
+//	char* (*pa)[5] = &arr;
+//
+//	int arr2[10] = { 0 };
+//	int(*pa2)[10] = &arr2;
+//	return 0;
+//}
+//int main()
+//{
+//	int arr[10] = { 1,2,3,4,5,6,7,8,9,10 };
+//	int(*pa)[10] = &arr;
+//	int i = 0;
+//	//for (i = 0; i < 10; i++)
+//	//{
+//	//	printf("%d ", (*pa)[i]);
+//	//}
+//
+//	for (i = 0; i < 10; i++)
+//	{
+//		printf("%d ", *(*pa + i));
+//	}
+//	return 0;
+//}
+//参数是数组的形式
+//void print1(int arr[3][5],int x,int y)
+//{
+//	int i = 0;
+//	int j = 0;
+//	for (i = 0; i < x; i++)
+//	{
+//		for (j = 0; j < y; j++)
+//		{
+//			printf("%d ", arr[i][j]);
+//		}
+//		printf("\n");
+//	}
+//}
+////参数是指针的形式
+//void print2(int (*p)[5],int x,int y)
+//{
+//	int i = 0;
+//	for (i = 0; i < x; i++)
+//	{
+//		int j = 0;
+//		for (j = 0; j < y; j++)
+//		{
+//			//printf("%d ", *(*(p + i) + j));
+//			//printf("%d ", (*(p + i))[j]);
+//			printf("%d ", p[i][j]);
+//		}
+//		printf("\n");
+//	}
+//}
+//int main()
+//{
+//	int arr[3][5] = { {1,2,3,4,5},{2,3,4,5,6},{3,4,5,6,7} };
+//	//print1(arr, 3, 5);
+//	print2(arr, 3, 5);
+//	return 0;
+//}
+//int main()
+//{
+//	int arr[10] = { 1,2,3,4,5,6,7,8,9,10 };
+//	int* p = arr;
+//	int i = 0;
+//	for (i = 0; i < 10; i++)
+//	{
+//		//printf("%d ", *(p + i));
+//		//printf("%d ", *(arr + i));
+//		//printf("%d ", arr[i]);
+//		//printf("%d ", p[i]);
+//	}
+//	return 0;
+//}
+//一级指针传参
+//void print(int* p, int sz)
+//{
+//	int i = 0;
+//	for (i = 0; i < sz; i++)
+//	{
+//		printf("%d\n", *(p + i));
+//	}
+//}
+//int main()
+//{
+//	int arr[10] = { 1,2,3,4,5,6,7,8,9 };
+//	int* p = arr;
+//	int sz = sizeof(arr) / sizeof(arr[0]);
+//	//一级指针p，传给函数
+//	print(p, sz);
+//	return 0;
+//}
+//void test1(int*p){}
+//void test2(char* p){}
+//int main()
+//{
+//	int a = 10;
+//	int* p1 = &a;
+//	test1(&a);
+//	test1(p1);
+//	char ch = 'w';
+//	char* pc = &ch;
+//	test2(&ch);
+//	test2(pc);
+//	return 0;
+//}
+//二级指针传参
+//void test(int** ptr)
+//{
+//	printf("num=%d\n", **ptr);
+//}
+//int main()
+//{
+//	int n = 10;
+//	int* p = &n;
+//	int** pp = &p;
+//	test(pp);
+//	test(&p);
+//	return 0;
+//}
+//void test(int** p){}
+//int main()
+//{
+//	int* ptr=NULL;
+//	int** pp = &ptr;
+//	test(&ptr);
+//	test(pp);
+//	int* arr[10];
+//	test(arr);//指针数组也可以
+//	return 0;
+//}
+//函数指针
+//int add(int x, int y)
+//{
+//	return x + y;
+//}
+//int main()
+//{
+//	int a = 10;
+//	int b = 20;
+//	int sum = add(a, b);
+//	//printf("%d\n", sum);
+//	//printf("%p\n", &add);
+//	//printf("%p\n", add);
+//	int(*pa)(int, int) = add;
+//	printf("%d\n", (*pa)(2, 3));//5
+//  printf("%d\n", pa(2, 3));
+//	return 0;
+//}
+//void Print(char* str)
+//{
+//	printf("%s\n", str);
+//}
+//int main()
+//{
+//	void(*p)(char*) = Print;
+//	(*p)("hello, bit");
+//	return 0;
+//}
+//函数指针数组
+//int add(int x, int y)
+//{
+//	return x + y;
+//}
+//int sub(int x, int y)
+//{
+//	return x - y;
+//}
+//int mul(int x, int y)
+//{
+//	return x * y;
+//}
+//int Div(int x, int y)
+//{
+//	return x / y;
+//}
+//int main()
+//{
+//	int(*parr[4])(int, int) = { add,sub,mul,Div };
+//	int i = 0;
+//	for (i = 0; i < 4; i++)
+//	{
+//		printf("%d\n", parr[i](3, 2));
+//	}
+//	return 0;
+//}
+//char* my_strcpy(char* dest, const char* src);
+//int main()
+//{
+//	//写一个函数指针pf，指向函数my_strcpy
+//	char* (*pf)(char*, const char*);
+//	//写一个函数指针数组pfArr,能够存放4个my_strcpy的地址
+//	char* (*pfArr[4])(char*, const char*);
+//	return 0;
+//}
+//计算器
+//void menu()
+//{
+//	printf("******************\n");
+//	printf("**1.add  2.sub****\n");
+//	printf("**3.mul  4.Div****\n");
+//	printf("**5.XOR  0.exit***\n");
+//	printf("******************\n");
+//}
+//int add(int x, int y)
+//{
+//	return x + y;
+//}
+//int sub(int x, int y)
+//{
+//	return x - y;
+//}
+//int mul(int x, int y)
+//{
+//	return x * y;
+//}
+//int Div(int x, int y)
+//{
+//	return x / y;
+//}
+//int XOR(int x, int y)
+//{
+//	return x ^ y;
+//}
+//int main()
+//{
+//	int input = 0;
+//	int x = 0;
+//	int y = 0;
+//	//函数指针数组pfArr
+//	int(*pfArr[])(int, int) = { 0,add,sub,mul,Div,XOR};
+//	do {
+//		menu();
+//		printf("请选择>;");
+//		scanf("%d", &input);
+//		if (input >= 1 && input <= 5) {
+//			printf("请输入操作数>:");
+//			scanf("%d%d", &x, &y);
+//			int ret = pfArr[input](x, y);
+//			printf("%d\n", ret);
+//		}
+//		else if (input == 0)
+//		{
+//			printf("退出\n");
+//		}
+//		else
+//		{
+//			printf("输入错误\n");
+//		}
+//
+//
+//	} while (input);
+//	return 0;
+//}
+
+//int add(int a, int b)
+//{
+//    return a + b;
+//}
+//int sub(int a, int b)
+//{
+//    return a - b;
+//}
+//int mul(int a, int b)
+//{
+//    return a * b;
+//}
+//int Div(int a, int b)
+//{
+//    return a / b;
+//}
+//void menu()
+//{
+//    printf("*************************\n");
+//    printf(" 1:add           2:sub \n");
+//    printf(" 3:mul           4:div \n");
+//    printf("*************************\n");
+//    printf("请选择：");
+//}
+//void Calc(int(*pf)(int,int))
+//{
+//    int x = 0;
+//    int y = 0;
+//    printf("输入操作数>：");
+//    scanf("%d %d", &x, &y);
+//    printf("%d\n", pf(x, y));
+//}
+//int main()
+//{
+//    menu();
+//    int input = 1;
+//    do
+//    {
+//
+//        scanf("%d", &input);
+//        switch (input)
+//        {
+//        case 1:
+//            Calc(add);
+//            break;
+//        case 2:
+//            Calc(sub);
+//            break;
+//        case 3:
+//            Calc(mul);
+//            break;
+//        case 4:
+//            Calc(Div);
+//            break;
+//        case 0:
+//            printf("退出程序\n");
+//            break;
+//        default:
+//            printf("选择错误\n");
+//            break;
+//        }
+//    } while (input);
+//
+//    return 0;
+//}
+//回调函数
+//void print(char* str)
+//{
+//	printf("hehe:%s", str);
+//}
+//void test(void(*p)(char* str))
+//{
+//	printf("test\n");
+//	p("bit");
+//}
+//int main()
+//{
+//
+//	test(print);
+//	return 0;
+//}
+//冒泡排序
+//void bubble_sort(int arr[], int sz)
+//{
+//	int i = 0;
+//	int tmp = 0;
+//	int j = 0;
+//	for (i = 0; i < sz - 1; i++)
+//	{
+//		for (j = 0; j < sz-i-1; j++)
+//		{
+//			if (arr[j] > arr[j + 1])
+//			{
+//				tmp = arr[j];
+//				arr[j] = arr[j + 1];
+//				arr[j + 1] = tmp;
+//			}
+//		}
+//	}
+//}
+//struct stu
+//{
+//	char name[20];
+//	int age;
+//};
+//int cmp_int(const void* e1, const void* e2)
+//{
+//	//比较两个整形
+//	return *(int*)e1 - *(int*)e2;
+//}
+//void test1()
+//{
+//	int arr[10] = { 9,8,7,6,5,4,3,2,1,0 };
+//	int sz = sizeof(arr) / sizeof(arr[0]);
+//	qsort(arr, sz, sizeof(arr[0]), cmp_int);
+//	int i = 0;
+//	for (i = 0; i < sz; i++)
+//	{
+//		printf("%d ", arr[i]);
+//	}
+//}
+//int cmp_float(const void* e1, const void* e2)
+//{
+//	//if (*(float*)e1 > *(float*)e2)
+//	//{
+//	//	return 1;
+//	//}
+//	//else if (*(float*)e1 < *(float*)e2)
+//	//{
+//	//	return -1;
+//	//}
+//	//else
+//	//	return 0;
+//	return ((int)(*(float*)e1 - *(float*)e2));
+//}
+//void test2()
+//{
+//	float f[] = { 9.0,8.0,7.0,6.0,5.0,4.0 };
+//	int sz = sizeof(f) / sizeof(f[0]);
+//	qsort(f, sz, sizeof(f[0]), cmp_float);
+//	int i = 0;
+//	for (i = 0; i < sz; i++)
+//	{
+//		printf("%f ", f[i]);
+//	}
+//}
+//int cmp_stu_by_age(const void* e1, const void* e2)
+//{
+//	return (((struct stu*)e1)->age - ((struct stu*)e2)->age);
+//}
+//int cmp_stu_by_name(const void* e1, const void* e2)
+//{
+//	return strcmp(((struct stu*)e1)->name,((struct stu*)e2)->name);
+//}
+////void test3()
+////{
+////	struct stu s[3] = { {"张三",10},{"gg",50},{"aiu",22} };
+////	int sz = sizeof(s) / sizeof(s[0]);
+////	qsort(s, sz, sizeof(s[0]), cmp_stu_by_age);
+////	qsort(s, sz, sizeof(s[0]), cmp_stu_by_name);
+////}
+//
+//void Swap(char* buf1, char* buf2, int width)
+//{
+//	int i = 0;
+//	for (i = 0; i < width; i++)
+//	{
+//		char tmp = *buf1;
+//		*buf1 = *buf2;
+//		*buf2 = tmp;
+//		buf1++;
+//		buf2++;
+//	}
+//}
+//int cmp_int(char* buf1, char* buf2)
+//{
+//	return (*(int*)buf1 - *(int*)buf2);
+//}
+//void bubble_sort(void* base, int sz, int width, int(*cmp)(void* e1, void* e2))
+//{
+//	int i = 0;
+//	for (i = 0; i < sz - 1; i++)
+//	{
+//		int j = 0;
+//		for (j = 0; j < sz - i - 1; j++)
+//		{
+//			//比较函数
+//			if (cmp((char*)base+j*width,(char*)base+(j+1)*width) > 0)
+//			{
+//				//交换函数,字符指针，需传width
+//				Swap((char*)base + j * width, (char*)base + (j + 1) * width, width);
+//			}
+//		}
+//	}
+//}
+//void test4()
+//{
+//	int arr[] = { 9,8,7,6,5,4,3,2,1,0 };
+//	int sz = sizeof(arr) / sizeof(arr[0]);
+//	bubble_sort(arr, sz, sizeof(arr[0]), cmp_int);
+//	int i = 0;
+//	for (i = 0; i < sz; i++)
+//	{
+//		printf("%d ", arr[i]);
+//	}
+//}
+//void test5()
+//{
+//	struct stu s[3] = { {"张三",10},{"gg",50},{"aiu",22} };
+//	int sz = sizeof(s) / sizeof(s[0]);
+//	//bubble_sort(s, sz, sizeof(s[0]), cmp_stu_by_age);
+//	bubble_sort(s, sz, sizeof(s[0]), cmp_stu_by_name);//未调试
+//
+//}
+//int main()
+//{
+//	//bubble_sort(arr, sz);
+//	//test1();
+//	//test2();
+//	//test3();
+//	//通用型
+//	//test4();
+//	test5();
+//	return 0;
+//}
+//指针和数组笔试题解析
+
+//int main()//重要
+//{
+	//sizeof(数组名)，&数组名
+	
+	//一维数组
+	//int a[] = { 1,2,3,4 };
+	//printf("%d\n", sizeof(a));      //16
+	//printf("%d\n", sizeof(a+0));    //4或8，a+0.首元素地址，计算的是地址大小，4或8
+	//printf("%d\n", sizeof(*a));     //4，首元素大小
+	//printf("%d\n", sizeof(a+1));    //4或8，第二个元素地址
+	//printf("%d\n", sizeof(a[1]));   //4，第二个元素大小
+	//printf("%d\n", sizeof(&a));     //4或8，取出数组地址
+	//printf("%d\n", sizeof(*&a));    //16，去除数组地址再解引用
+	//printf("%d\n", sizeof(&a+1));   //4或8，&a+1是一个地址，地址跳过整个数组
+	//printf("%d\n", sizeof(&a[0]));  //4或8，第一个元素地址
+	//printf("%d\n", sizeof(&a[0]+1));//4或8，第二个元素地址
+
+
+	//字符数组
+	//char arr[] = { 'a','b','c','d','e','f' };
+	//printf("%d\n", sizeof(arr));        //6
+	//printf("%d\n", sizeof(arr + 0));    //4或8，arr+0首元素地址
+	//printf("%d\n", sizeof(*arr));       //1 首元素-首元素地址解引用
+	//printf("%d\n", sizeof(arr[1]));     //1
+	//printf("%d\n", sizeof(&arr));       //4或8 数组地址
+	//printf("%d\n", sizeof(&arr + 1));   //4或8
+	//printf("%d\n", sizeof(&arr[0] + 1));//4或8
+
+	//printf("%d\n", strlen(arr));        //随机值，arr无\0，strlen遇到\0结束
+	//printf("%d\n", strlen(arr + 0));    //随机值 arr+0首元素地址
+	//printf("%d\n", strlen(*arr));       //err  strlen()参数为地址，*arr为a，AScii为97，非法访问地址为97处数据，代码错误
+	//printf("%d\n", strlen(arr[1]));     //err 同上
+	//printf("%d\n", strlen(&arr));       //随机值 数组地址
+	//printf("%d\n", strlen(&arr + 1));   //随机值 比&arr少6
+	//printf("%d\n", strlen(&arr[0] + 1));//随机值，从b处访问，比&arr少1
+
+	//char arr[] = "abcdef";
+	//printf("%d\n", sizeof(arr));        //7，sizeof计算所占空间大小
+	//printf("%d\n", sizeof(arr + 0));    //4或8，arr+0首元素地址
+	//printf("%d\n", sizeof(*arr));       //1 首元素大小
+	//printf("%d\n", sizeof(arr[1]));     //1 第二个元素大小
+	//printf("%d\n", sizeof(&arr));       //4或8 数组地址
+	//printf("%d\n", sizeof(&arr + 1));   //4或8 跳过整个数组后的地址
+	//printf("%d\n", sizeof(&arr[0] + 1));//4或8 b的地址
+
+	//printf("%d\n", strlen(arr));        //6
+	//printf("%d\n", strlen(arr + 0));    //6
+	//printf("%d\n", strlen(*arr));       //err
+	//printf("%d\n", strlen(arr[1]));     //err 访问98处地址
+	//printf("%d\n", strlen(&arr));       //6 从数组起始位置访问，但会警告，数组地址应为数组指针 char(*p)[7]=&arr,arr类型char(*)[7]，
+	////                                      而strlen参数为const char*，两个类型不兼容，
+	//printf("%d\n", strlen(&arr + 1));   //随机值
+	//printf("%d\n", strlen(&arr[0] + 1));//5 从b的位置开始
+
+	//char* p = "abcdef";//把常量字符串a地址放到p里
+	//printf("%d\n", sizeof(p));        //4或8
+	//printf("%d\n", sizeof(p + 1));    //4或8 计算字符b地址大小
+	//printf("%d\n", sizeof(*p));       //1 *p是字符串的第一个字符
+	//printf("%d\n", sizeof(p[0]));     //1  int arr[10]; arr[0]==*(arr+0)   p[0]==*(p+0)=='a'
+	//printf("%d\n", sizeof(&p));       //4或8
+	//printf("%d\n", sizeof(&p + 1));   //4或8 指向跳过p的地址
+	//printf("%d\n", sizeof(&p[0] + 1));//4或8  计算b的地址大小
+
+	//printf("%d\n", strlen(p));        //6
+	//printf("%d\n", strlen(p + 1));    //5 p+1为b地址
+	//printf("%d\n", strlen(*p));       //err 非法访问
+	//printf("%d\n", strlen(p[0]));     //err
+	//printf("%d\n", strlen(&p));       //随机值 从p的地址开始计算
+	//printf("%d\n", strlen(&p + 1));   //随机值
+	//printf("%d\n", strlen(&p[0] + 1));//5
+
+
+	//二维数组（重要）
+	//int a[3][4] = { 0 };
+	//printf("%d\n", sizeof(a));           //48 数组总元素大小 3*4*4
+	//printf("%d\n", sizeof(a[0][0]));     //4
+	//printf("%d\n", sizeof(a[0]));        //16  第一行4*4  a[0]相当于第一行作为一维数组的数组名
+	//printf("%d\n", sizeof(a[0] + 1));    //4 第一行第二个元素地址，a[0]是首元素地址 数组名并没有单独放在sizeof内部
+	//printf("%d\n", sizeof(*(a[0] + 1))); //4 第一行第二个元素大小
+	//printf("%d\n", sizeof(a + 1));       //4或8 a是二维数组数组名 是首元素地址 a+1第二行一维数组地址
+	//printf("%d\n", sizeof(*(a + 1)));    //16 第二行元素大小
+	//printf("%d\n", sizeof(&a[0] + 1));   //4或8 第二行地址
+	//printf("%d\n", sizeof(*(&a[0] + 1)));//16
+	//printf("%d\n", sizeof(*a));          //16 a是首元素地址，是第一行地址 *a是第一行
+	//printf("%d\n", sizeof(a[3]));        //16 sizeof内部表达式不参与真实运算，不会访问第四行，依据类型来计算大小
+	//return 0;
+//}
+//语言 算法 数据结构 操作系统 网络
+//指针笔试题
+//int main()
+//{
+//	int a[5] = { 1,2,3,4,5 };
+//	int* ptr = (int*)(&a + 1);//数组指针类型强制类型转换
+//	printf("%d,%d\n", *(a + 1), *(ptr - 1));
+//	return 0;
+//}
+//struct Test//p结构体指针,指针+-整数
+//{
+//	int Num;
+//	char* pcName;
+//	short sDate;
+//	char cha[2];
+//	short sBa[4];
+//}*p;
+////假设p的值为0x100000，如下表达式的值分别是多少？
+////已知结构体Test类型的变量大小是20个字节
+//int main()
+//{
+//	p = (struct Test*)0x100000;
+//	printf("%p\n", p + 0x1);//0x1为1，0x100000+14（20），以%p打印，0x00100014
+//	printf("%p\n", (unsigned long)p + 0x1);//0x100000转换为整形 1048576 再+1 1048577 转为16进制 0x100001 以%p打印，0x00100001
+//	printf("%p\n", (unsigned int*)p + 0x1);//0x100000转换为整形指针，int指针+1，0x100004 以%p打印，0x00100001
+//	return 0;
+//}
+//int main()
+//{
+//	int a[4] = { 1,2,3,4 };
+//	int* ptr1 = (int*)(&a + 1);
+//	int* ptr2 = (int*)((int)a + 1);
+//	printf("%x,%x", ptr1[-1], *ptr2);
+//	return 0;
+//}
+//int main()
+//{
+//	int a[3][2] = { (0,1),(2,3),(4,5) };//此处为逗号表达式，数组内容为{1，3}，{5，0}，{0，0}
+//	int* p;
+//	p = a[0];//a[0]是第一行数组名，代表首元素地址，就是1的地址
+//	printf("%d", p[0]);//等价于*（p+0）
+//	return 0;
+//}
+int main()
+{
+	int a[5][5]; 
+	int(*p)[4];
+	p =a;//p类型 int(*)[4]; a类型 int(*)[5];
+	printf("%p,%d\n", &p[4][2] - &a[4][2], &p[4][2] - &a[4][2]);
+	return 0;
+}
